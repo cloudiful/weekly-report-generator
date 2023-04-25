@@ -1,5 +1,5 @@
-# Prerequisite
-# 1. 安装 xlwings 和对于 excel 的插件
+# Prerequisite:
+# 1. 安装 xlwings 和 excel 的插件
 #    （参考 https://docs.xlwings.org/zh_TW/latest/installation.html#installation）
 #    先 pip install xlwings 或 conda install xlwings
 #    再 xlwings addin install
@@ -23,10 +23,13 @@ class FileModify:
         # 用户选择的文件
         self.file = None
 
-        # 模式：
-        #   1-自动模式：即当前选中的文件是上周的周报
-        #   2-手动模式：即当前选中文件需修改日期或名字
-        self.mode = 1
+        # 当前日期信息
+        self.currentDate = None
+        self.currentWeekday = None
+        self.currentYear = None
+        # 预期输出的日期
+        self.startDate = None
+        self.endDate = None
 
         # 用户姓名
         self.name = ''
@@ -37,6 +40,8 @@ class FileModify:
         # 读取的excel数据
         self.wb = None
         self.sheet = None
+
+        self.getTime()
 
     def showFiles(self):
         """显示当前目录下的所有excel文件"""
@@ -58,6 +63,13 @@ class FileModify:
 
         self.file = self.files[int(i)]
 
+    def getTime(self):
+        self.currentDate = datetime.datetime.today()
+        self.currentWeekday = datetime.datetime.today().weekday()
+        self.currentYear = datetime.datetime.today().strftime('%Y')
+        self.startDate = self.currentDate + datetime.timedelta(days=-self.currentWeekday)
+        self.endDate = self.currentDate + datetime.timedelta(days=-self.currentWeekday + 4)
+
     def modifyFileName(self):
         """更新文件名中的日期和姓名"""
         print('- - - - - - - - - -\n'
@@ -70,24 +82,17 @@ class FileModify:
         # 右括号右三位为名字
         nameIndex = str(self.file).find('）') + 3
 
-        # 获取文件名中的日期字符串并转成datetime
-        startDate = datetime.datetime.strptime(str(self.file)[startIndex:startIndex + 6], '%y%m%d')
-        endDate = datetime.datetime.strptime(str(self.file)[endIndex:endIndex + 6], '%y%m%d')
-        newStartDate = startDate + datetime.timedelta(days=7)
-        newEndDate = endDate + datetime.timedelta(days=7)
-
         # 获取名字位置，即第二次出现'-'后面和文件后缀名前面
         originalName = str(self.file)[nameIndex:len(str(self.file)) - len(str(self.file.suffix))]
-        newName = originalName
 
-        if self.mode == '2':
-            newName = input('改变名字（默认不修改）：')
-            if newName == '':
-                newName = originalName
+        self.name = input('输入执行人姓名（直接回车即默认不修改）：')
+        if self.name == '':
+            self.name = originalName
 
-        self.newFile = '周报（' + newStartDate.strftime('%y%m%d') + '-' + newEndDate.strftime(
-            '%y%m%d') + '）- ' + newName + '.xlsx'
-        print('新文件名：', self.newFile)
+        self.newFile = '周报（' + self.startDate.strftime('%y%m%d') + '-' + self.endDate.strftime(
+            '%y%m%d') + '）- ' + self.name + '.xlsx'
+        print('- - - - - - - - - -\n'
+              '新文件名：', self.newFile)
 
         shutil.copy2(self.file, self.newFile)
         print('新文件保存成功！')
@@ -98,44 +103,69 @@ class FileModify:
               '正在进行日期变更')
         self.wb = xw.Book(self.newFile)
         self.sheet = self.wb.sheets[0]
-        # 时间格式
-        for index, date in enumerate(self.sheet['A1:H20']):
+        # 本周时间
+        for index, date in enumerate(self.sheet['D4:D6']):
             if type(date.value) == datetime.datetime:
-                date.value += datetime.timedelta(days=7)
-        # 标题
-        currentDay = datetime.datetime.today()
-        currentWeekday = datetime.datetime.today().weekday()
-        currentYear = datetime.datetime.today().strftime('%Y')
-        print(currentDay - datetime.timedelta(days=currentWeekday))
-        newStartDate = currentDay + datetime.timedelta(days=-currentWeekday)
-        newEndDate = currentDay + datetime.timedelta(days=-currentWeekday+4)
+                date.value = self.startDate
+        for index, date in enumerate(self.sheet['E4:E6']):
+            if type(date.value) == datetime.datetime:
+                date.value = self.endDate
+        # 下周时间
+        for index, date in enumerate(self.sheet['D10:D12']):
+            if type(date.value) == datetime.datetime:
+                date.value = self.startDate + datetime.timedelta(days=7)
+        for index, date in enumerate(self.sheet['E10:E12']):
+            if type(date.value) == datetime.datetime:
+                date.value = self.endDate + datetime.timedelta(days=7)
 
-        newTitle = currentYear + '年工作周报（' + datetime.datetime.strftime(newStartDate, '%m.%d') + '-' + datetime.datetime.strftime(newEndDate, '%m.%d') + '）'
+        # 下周时间
+        for index, date in enumerate(self.sheet['D16:D18']):
+            if type(date.value) == datetime.datetime:
+                date.value = self.startDate - datetime.timedelta(days=7)
+        for index, date in enumerate(self.sheet['E16:E18']):
+            if type(date.value) == datetime.datetime:
+                date.value = self.endDate - datetime.timedelta(days=7)
+
+        # 标题
+
+        newTitle = self.currentYear + '年工作周报（' + datetime.datetime.strftime(self.startDate,
+                                                                                 '%m.%d') + '-' + datetime.datetime.strftime(
+            self.endDate, '%m.%d') + '）'
 
         self.sheet['B1'].value = newTitle
 
         print('已完成日期变更！')
 
-    def moveTexts(self):
-        print('正在进行文本搬移')
+    def changeTexts(self):
+        print('- - - - - - - - - -\n'
+              '正在进行工作内容修改')
 
-        # 将本周工作移动到上周
-        self.sheet['C16'].value = self.sheet['C4'].value
-        self.sheet['C17'].value = self.sheet['C5'].value
-        self.sheet['C18'].value = self.sheet['C6'].value
+        # 将本周工作移动到上周或要求输入上周工作内容
+        for i, x in enumerate(self.sheet['C5:C7'].value):
+            if x is None:
+                self.sheet['C' + str(17 + i)].value = input('请输入上周工作内容第' + str(i+1) + '条：')
+            else:
+                self.sheet['C' + str(17 + i)].value = self.sheet['C' + str(5 + i)].value
 
-        # 将下周工作移动到本周
-        self.sheet['C4'].value = self.sheet['C10'].value
-        self.sheet['C5'].value = self.sheet['C11'].value
-        self.sheet['C6'].value = self.sheet['C12'].value
-
-        print('已完成文本搬移！')
+        # 将下周工作移动到本周或要求输入本周工作内容
+        for i, x in enumerate(self.sheet['C11:C13'].value):
+            if x is None:
+                self.sheet['C' + str(5 + i)].value = input('请输入本周工作内容第' + str(i+1) + '条：')
+            else:
+                self.sheet['C' + str(5 + i)].value = self.sheet['C' + str(11 + i)].value
 
         # 询问下周工作计划
-        print('- - - - - - - - - -\n')
-        self.sheet['C10'].value = input('请输入下周工作计划第1条:')
-        self.sheet['C11'].value = input('请输入下周工作计划第2条:')
-        self.sheet['C12'].value = input('请输入下周工作计划第3条:')
+        self.sheet['C11'].value = input('请输入下周工作计划第1条:')
+        self.sheet['C12'].value = input('请输入下周工作计划第2条:')
+        self.sheet['C13'].value = input('请输入下周工作计划第3条:')
+
+        print('已完成工作内容修改！')
+
+    def changeName(self):
+        print('- - - - - - - - - -\n'
+              '正在进行执行人修改')
+        self.sheet['G4:G6'].value = self.name
+        print('执行人修改完成！')
 
 
 if __name__ == '__main__':
@@ -155,4 +185,8 @@ if __name__ == '__main__':
     fm.changeDate()
 
     # 移动本周工作情况到上周 移动下周工作计划到本周工作情况
-    fm.moveTexts()
+    fm.changeTexts()
+
+    fm.changeName()
+
+    input('所有操作均已完成，请在Excel软件中保存')
