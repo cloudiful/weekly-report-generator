@@ -1,5 +1,4 @@
 # weekly-report-generator
-a generator for bullshit weekly report
 本软件要求你的电脑上已经装有Microsoft Excel软件
 
 Prerequisite:
