@@ -6,9 +6,10 @@ Prerequisite:
 
    （参考 https://docs.xlwings.org/zh_TW/latest/installation.html#installation）
    
-      省流版本：先 pip install xlwings 或 conda install xlwings
+      省流版本：先 
+              pip install xlwings 或 conda install xlwings
       
-              再 xlwings addin install
+              xlwings addin install
               
 Usage:
 
