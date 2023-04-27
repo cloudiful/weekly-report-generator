@@ -1,16 +1,25 @@
-# weekly-report-generator
-本软件要求你的电脑上已经装有Microsoft Excel软件
+# 周报生成器
+
+本脚本要求你的电脑上已经装有Microsoft Excel软件
 
 Prerequisite:
 1. 安装 xlwings 和 excel 的插件
 
    （参考 https://docs.xlwings.org/zh_TW/latest/installation.html#installation）
    
-      省流版本：先 
-              pip install xlwings 或 conda install xlwings
-      ```bash
-              xlwings addin install
-      ```bash
+省流:
+先
+```bash
+pip install xlwings 
+```
+或
+```bash
+conda install xlwings
+```
+然后再
+```bash
+xlwings addin install
+```
               
 Usage:
 
