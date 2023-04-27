@@ -104,25 +104,25 @@ class FileModify:
         self.wb = xw.Book(self.newFile)
         self.sheet = self.wb.sheets[0]
         # 本周时间
-        for index, date in enumerate(self.sheet['D4:D6']):
+        for index, date in enumerate(self.sheet['D4:D7']):
             if type(date.value) == datetime.datetime:
                 date.value = self.startDate
-        for index, date in enumerate(self.sheet['E4:E6']):
+        for index, date in enumerate(self.sheet['E4:E7']):
             if type(date.value) == datetime.datetime:
                 date.value = self.endDate
         # 下周时间
-        for index, date in enumerate(self.sheet['D10:D12']):
+        for index, date in enumerate(self.sheet['D10:D13']):
             if type(date.value) == datetime.datetime:
                 date.value = self.startDate + datetime.timedelta(days=7)
-        for index, date in enumerate(self.sheet['E10:E12']):
+        for index, date in enumerate(self.sheet['E10:E13']):
             if type(date.value) == datetime.datetime:
                 date.value = self.endDate + datetime.timedelta(days=7)
 
         # 下周时间
-        for index, date in enumerate(self.sheet['D16:D18']):
+        for index, date in enumerate(self.sheet['D16:D19']):
             if type(date.value) == datetime.datetime:
                 date.value = self.startDate - datetime.timedelta(days=7)
-        for index, date in enumerate(self.sheet['E16:E18']):
+        for index, date in enumerate(self.sheet['E16:E19']):
             if type(date.value) == datetime.datetime:
                 date.value = self.endDate - datetime.timedelta(days=7)
 
@@ -164,7 +164,9 @@ class FileModify:
     def changeName(self):
         print('- - - - - - - - - -\n'
               '正在进行执行人修改')
-        self.sheet['G4:G6'].value = self.name
+        self.sheet['G5:G7'].value = self.name
+        self.sheet['F11:F13'].value = self.name
+        self.sheet['F17:F19'].value = self.name
         print('执行人修改完成！')
 
 
