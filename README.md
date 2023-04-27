@@ -10,7 +10,7 @@ Prerequisite:
 省流:
 先
 ```bash
-pip install xlwings 
+pip install xlwings （如需使用国内pip源，在后面加上 -i https://pypi.tuna.tsinghua.edu.cn/simple 即可）
 ```
 或
 ```bash
