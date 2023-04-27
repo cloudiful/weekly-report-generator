@@ -5,7 +5,7 @@
 Prerequisite:
 1. 安装 xlwings 和 excel 的插件
 
-   （参考 https://docs.xlwings.org/zh_TW/latest/installation.html#installation）
+   （参考 https://docs.xlwings.org/zh_CN/latest/installation.html）
    
 省流:
 先
