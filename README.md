@@ -14,7 +14,7 @@ pip install xlwings
 ```
 或
 ```bash
-conda install xlwings
+conda install xlwings （推荐安装miniconda后使用conda安装）
 ```
 然后再
 ```bash
