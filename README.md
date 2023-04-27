@@ -8,11 +8,15 @@ Prerequisite:
    （参考 https://docs.xlwings.org/zh_CN/latest/installation.html）
    
 省流:
-先
+使用pip安装：
 ```bash
-pip install xlwings （如需使用国内pip源，在后面加上 -i https://pypi.tuna.tsinghua.edu.cn/simple 即可）
+pip install xlwings 
 ```
-或
+如需使用国内pip源，在后面加上 -i https://pypi.tuna.tsinghua.edu.cn/simple，即：
+```bash
+pip install xlwings -i https://pypi.tuna.tsinghua.edu.cn/simple
+```
+或使用conda安装：
 ```bash
 conda install xlwings
 ```
