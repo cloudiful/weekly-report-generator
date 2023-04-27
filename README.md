@@ -16,10 +16,6 @@ pip install xlwings
 ```bash
 pip install xlwings -i https://pypi.tuna.tsinghua.edu.cn/simple
 ```
-或使用conda安装：
-```bash
-conda install xlwings
-```
 然后再
 ```bash
 xlwings addin install
