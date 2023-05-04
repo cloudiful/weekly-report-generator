@@ -91,11 +91,15 @@ class FileModify:
 
         self.newFile = '周报（' + self.startDate.strftime('%y%m%d') + '-' + self.endDate.strftime(
             '%y%m%d') + '）- ' + self.name + '.xlsx'
-        print('- - - - - - - - - -\n'
-              '新文件名：', self.newFile)
 
-        shutil.copy2(self.file, self.newFile)
-        print('新文件保存成功！')
+        if str(self.file) == str(self.newFile):
+            print('- - - - - - - - - -\n'
+                  '当前文件名不需要修改，将直接对当前文件进行修改')
+        else:
+            print('- - - - - - - - - -\n'
+                  '新文件名：', self.newFile)
+            shutil.copy2(self.file, self.newFile)
+            print('新文件保存成功！')
 
     def changeDate(self):
         """变更excel中的文件"""
@@ -105,26 +109,20 @@ class FileModify:
         self.sheet = self.wb.sheets[0]
         # 本周时间
         for index, date in enumerate(self.sheet['D4:D7']):
-            if type(date.value) == datetime.datetime:
-                date.value = self.startDate
+            date.value = self.startDate
         for index, date in enumerate(self.sheet['E4:E7']):
-            if type(date.value) == datetime.datetime:
-                date.value = self.endDate
+            date.value = self.endDate
         # 下周时间
         for index, date in enumerate(self.sheet['D10:D13']):
-            if type(date.value) == datetime.datetime:
-                date.value = self.startDate + datetime.timedelta(days=7)
+            date.value = self.startDate + datetime.timedelta(days=7)
         for index, date in enumerate(self.sheet['E10:E13']):
-            if type(date.value) == datetime.datetime:
-                date.value = self.endDate + datetime.timedelta(days=7)
+            date.value = self.endDate + datetime.timedelta(days=7)
 
-        # 下周时间
+        # 上周时间
         for index, date in enumerate(self.sheet['D16:D19']):
-            if type(date.value) == datetime.datetime:
-                date.value = self.startDate - datetime.timedelta(days=7)
+            date.value = self.startDate - datetime.timedelta(days=7)
         for index, date in enumerate(self.sheet['E16:E19']):
-            if type(date.value) == datetime.datetime:
-                date.value = self.endDate - datetime.timedelta(days=7)
+            date.value = self.endDate - datetime.timedelta(days=7)
 
         # 标题
 
@@ -140,17 +138,25 @@ class FileModify:
         print('- - - - - - - - - -\n'
               '正在进行工作内容修改')
 
+        # 添加序号
+        self.sheet['B5,B11,B17'].value = '1'
+        self.sheet['B6,B12,B18'].value = '2'
+        self.sheet['B7,B13,B19'].value = '3'
+
+        # 添加本周工作内容完成情况
+        self.sheet['F5:F7'].value = '完成'
+
         # 将本周工作移动到上周或要求输入上周工作内容
         for i, x in enumerate(self.sheet['C5:C7'].value):
             if x is None:
-                self.sheet['C' + str(17 + i)].value = input('请输入上周工作内容第' + str(i+1) + '条：')
+                self.sheet['C' + str(17 + i)].value = input('请输入上周工作内容第' + str(i + 1) + '条：')
             else:
                 self.sheet['C' + str(17 + i)].value = self.sheet['C' + str(5 + i)].value
 
         # 将下周工作移动到本周或要求输入本周工作内容
         for i, x in enumerate(self.sheet['C11:C13'].value):
             if x is None:
-                self.sheet['C' + str(5 + i)].value = input('请输入本周工作内容第' + str(i+1) + '条：')
+                self.sheet['C' + str(5 + i)].value = input('请输入本周工作内容第' + str(i + 1) + '条：')
             else:
                 self.sheet['C' + str(5 + i)].value = self.sheet['C' + str(11 + i)].value
 
@@ -168,6 +174,18 @@ class FileModify:
         self.sheet['F11:F13'].value = self.name
         self.sheet['F17:F19'].value = self.name
         print('执行人修改完成！')
+
+    def blankDetect(self):
+        """最后阶段检测是否有空的工作内容，如果有则删除整行"""
+        for i, x in enumerate(self.sheet['C5:C7'].value):
+            if x is None:
+                self.sheet['B' + str(5 + i) + ':G' + str(5 + i)].value = None
+        for i, x in enumerate(self.sheet['C11:C13'].value):
+            if x is None:
+                self.sheet['B' + str(11 + i) + ':G' + str(11 + i)].value = None
+        for i, x in enumerate(self.sheet['C17:C19'].value):
+            if x is None:
+                self.sheet['B' + str(17 + i) + ':G' + str(17 + i)].value = None
 
 
 if __name__ == '__main__':
@@ -189,6 +207,10 @@ if __name__ == '__main__':
     # 移动本周工作情况到上周 移动下周工作计划到本周工作情况
     fm.changeTexts()
 
+    # 修改执行人姓名
     fm.changeName()
 
-    input('所有操作均已完成，请在Excel软件中保存')
+    # 空内容检测
+    fm.blankDetect()
+
+    print('所有操作均已完成，请在Excel软件中保存')
