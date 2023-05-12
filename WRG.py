@@ -108,20 +108,20 @@ class FileModify:
         self.wb = xw.Book(self.newFile)
         self.sheet = self.wb.sheets[0]
         # 本周时间
-        for index, date in enumerate(self.sheet['D4:D7']):
+        for index, date in enumerate(self.sheet['D5:D7']):
             date.value = self.startDate
-        for index, date in enumerate(self.sheet['E4:E7']):
+        for index, date in enumerate(self.sheet['E5:E7']):
             date.value = self.endDate
         # 下周时间
-        for index, date in enumerate(self.sheet['D10:D13']):
+        for index, date in enumerate(self.sheet['D11:D13']):
             date.value = self.startDate + datetime.timedelta(days=7)
-        for index, date in enumerate(self.sheet['E10:E13']):
+        for index, date in enumerate(self.sheet['E11:E13']):
             date.value = self.endDate + datetime.timedelta(days=7)
 
         # 上周时间
-        for index, date in enumerate(self.sheet['D16:D19']):
+        for index, date in enumerate(self.sheet['D17:D19']):
             date.value = self.startDate - datetime.timedelta(days=7)
-        for index, date in enumerate(self.sheet['E16:E19']):
+        for index, date in enumerate(self.sheet['E17:E19']):
             date.value = self.endDate - datetime.timedelta(days=7)
 
         # 标题
